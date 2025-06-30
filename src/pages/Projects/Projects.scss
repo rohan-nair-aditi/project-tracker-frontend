@@ -132,16 +132,32 @@
         }
       }
 
-      .project-status {
+      .project-info {
         margin-bottom: 15px;
 
-        .status-badge {
-          color: white;
-          padding: 6px 12px;
-          border-radius: 15px;
-          font-size: 0.9rem;
-          font-weight: 500;
-          text-transform: capitalize;
+        .project-status {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex-wrap: wrap;
+
+          .status-badge {
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: capitalize;
+          }
+
+          .owner-badge {
+            background-color: #95a5a6;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+          }
         }
       }
 

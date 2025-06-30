@@ -35,29 +35,50 @@ const ProjectDetail = () => {
       setTasks(tasksData);
       setUsers(usersData);
     } catch (err) {
-      setError('Failed to fetch project details');
+      if (err.response?.status === 403) {
+        setError('You do not have permission to view this project');
+      } else {
+        setError('Failed to fetch project details');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const handleCreateTask = () => {
+    if (!project?.can_edit) {
+      setError('Only the project owner can create tasks');
+      return;
+    }
     setEditingTask(null);
     setShowTaskModal(true);
   };
 
   const handleEditTask = (task) => {
+    if (!project?.can_edit) {
+      setError('Only the project owner can edit tasks');
+      return;
+    }
     setEditingTask(task);
     setShowTaskModal(true);
   };
 
   const handleDeleteTask = async (taskId) => {
+    if (!project?.can_edit) {
+      setError('Only the project owner can delete tasks');
+      return;
+    }
+    
     if (window.confirm('Are you sure you want to delete this task?')) {
       try {
         await taskService.deleteTask(taskId);
         setTasks(tasks.filter(t => t.id !== taskId));
       } catch (err) {
-        setError('Failed to delete task');
+        if (err.response?.status === 403) {
+          setError('You can only delete tasks in your own projects');
+        } else {
+          setError('Failed to delete task');
+        }
       }
     }
   };
@@ -105,6 +126,7 @@ const ProjectDetail = () => {
 
   const taskCounts = getTaskCounts();
   const filteredTasks = getFilteredTasks();
+  const canEdit = project.can_edit;
 
   return (
     <div className="project-detail">
@@ -126,15 +148,27 @@ const ProjectDetail = () => {
             <span className="created-date">
               Created {new Date(project.created_at).toLocaleDateString()}
             </span>
+            {!canEdit && (
+              <span className="owner-info">
+                Owner: {project.first_name} {project.last_name}
+              </span>
+            )}
           </div>
           {project.description && (
             <p className="project-description">{project.description}</p>
           )}
+          {!canEdit && (
+            <div className="permission-notice">
+              <span>📋 You are viewing this project. Only the owner can manage tasks.</span>
+            </div>
+          )}
         </div>
         <div className="header-actions">
-          <button onClick={handleCreateTask} className="create-task-btn">
-            Create New Task
-          </button>
+          {canEdit && (
+            <button onClick={handleCreateTask} className="create-task-btn">
+              Create New Task
+            </button>
+          )}
         </div>
       </div>
 
@@ -169,10 +203,12 @@ const ProjectDetail = () => {
         {filteredTasks.length === 0 ? (
           <div className="empty-tasks">
             <h3>No tasks {filter !== 'all' ? `with status "${filter}"` : ''}</h3>
-            <p>Create a new task to get started</p>
-            <button onClick={handleCreateTask} className="create-task-btn">
-              Create Task
-            </button>
+            <p>{canEdit ? 'Create a new task to get started' : 'No tasks to display'}</p>
+            {canEdit && (
+              <button onClick={handleCreateTask} className="create-task-btn">
+                Create Task
+              </button>
+            )}
           </div>
         ) : (
           <div className="tasks-list">
@@ -181,6 +217,7 @@ const ProjectDetail = () => {
                 key={task.id}
                 task={task}
                 users={users}
+                canEdit={canEdit}
                 onEdit={handleEditTask}
                 onDelete={handleDeleteTask}
               />
@@ -189,7 +226,7 @@ const ProjectDetail = () => {
         )}
       </div>
 
-      {showTaskModal && (
+      {showTaskModal && canEdit && (
         <TaskModal
           task={editingTask}
           projectId={id}
@@ -201,5 +238,6 @@ const ProjectDetail = () => {
     </div>
   );
 };
+
 
 export default ProjectDetail;

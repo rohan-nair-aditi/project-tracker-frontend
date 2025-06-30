@@ -37,6 +37,7 @@
         align-items: center;
         gap: 15px;
         margin-bottom: 15px;
+        flex-wrap: wrap;
 
         .status-badge {
           color: white;
@@ -51,12 +52,34 @@
           color: #7f8c8d;
           font-size: 0.9rem;
         }
+
+        .owner-info {
+          background-color: #95a5a6;
+          color: white;
+          padding: 4px 8px;
+          border-radius: 12px;
+          font-size: 0.8rem;
+          font-weight: 500;
+        }
       }
 
       .project-description {
         color: #7f8c8d;
         line-height: 1.6;
-        margin: 0;
+        margin: 0 0 15px 0;
+      }
+
+      .permission-notice {
+        background-color: #e8f5e8;
+        border: 1px solid #d4edda;
+        border-radius: 4px;
+        padding: 10px;
+        margin-top: 10px;
+
+        span {
+          color: #155724;
+          font-size: 0.9rem;
+        }
       }
     }
 

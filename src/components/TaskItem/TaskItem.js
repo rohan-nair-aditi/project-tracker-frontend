@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import CommentModal from '../CommentModal/CommentModal';
 import './TaskItem.scss';
 
-const TaskItem = ({ task, users, onEdit, onDelete }) => {
+const TaskItem = ({ task, users, canEdit, onEdit, onDelete }) => {
   const [showComments, setShowComments] = useState(false);
 
   const getPriorityColor = (priority) => {
@@ -77,12 +77,16 @@ const TaskItem = ({ task, users, onEdit, onDelete }) => {
             <button onClick={() => setShowComments(true)} className="comments-btn">
               Comments
             </button>
-            <button onClick={() => onEdit(task)} className="edit-btn">
-              Edit
-            </button>
-            <button onClick={() => onDelete(task.id)} className="delete-btn">
-              Delete
-            </button>
+            {canEdit && (
+              <>
+                <button onClick={() => onEdit(task)} className="edit-btn">
+                  Edit
+                </button>
+                <button onClick={() => onDelete(task.id)} className="delete-btn">
+                  Delete
+                </button>
+              </>
+            )}
           </div>
         </div>
 
@@ -108,6 +112,12 @@ const TaskItem = ({ task, users, onEdit, onDelete }) => {
             </span>
           </div>
         </div>
+
+        {!canEdit && (
+          <div className="read-only-notice">
+            <span>👁️ Read-only view - Only project owner can edit tasks</span>
+          </div>
+        )}
       </div>
 
       {showComments && (
@@ -122,4 +132,3 @@ const TaskItem = ({ task, users, onEdit, onDelete }) => {
 };
 
 export default TaskItem;
-

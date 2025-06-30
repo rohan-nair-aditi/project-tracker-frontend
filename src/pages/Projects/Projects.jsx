@@ -43,7 +43,11 @@ const Projects = () => {
         await projectService.deleteProject(projectId);
         setProjects(projects.filter(p => p.id !== projectId));
       } catch (err) {
-        setError('Failed to delete project');
+        if (err.response?.status === 403) {
+          setError('You can only delete your own projects');
+        } else {
+          setError('Failed to delete project');
+        }
       }
     }
   };
@@ -76,7 +80,7 @@ const Projects = () => {
   return (
     <div className="projects-page">
       <div className="projects-header">
-        <h1>My Projects</h1>
+        <h1>All Projects</h1>
         <button onClick={handleCreateProject} className="create-btn">
           Create New Project
         </button>
@@ -100,29 +104,38 @@ const Projects = () => {
                 <h3>
                   <Link to={`/projects/${project.id}`}>{project.title}</Link>
                 </h3>
-                <div className="project-actions">
-                  <button 
-                    onClick={() => handleEditProject(project)}
-                    className="edit-btn"
-                  >
-                    Edit
-                  </button>
-                  <button 
-                    onClick={() => handleDeleteProject(project.id)}
-                    className="delete-btn"
-                  >
-                    Delete
-                  </button>
-                </div>
+                {project.can_edit && (
+                  <div className="project-actions">
+                    <button 
+                      onClick={() => handleEditProject(project)}
+                      className="edit-btn"
+                    >
+                      Edit
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteProject(project.id)}
+                      className="delete-btn"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
               </div>
 
-              <div className="project-status">
-                <span 
-                  className="status-badge"
-                  style={{ backgroundColor: getStatusColor(project.status) }}
-                >
-                  {project.status}
-                </span>
+              <div className="project-info">
+                <div className="project-status">
+                  <span 
+                    className="status-badge"
+                    style={{ backgroundColor: getStatusColor(project.status) }}
+                  >
+                    {project.status}
+                  </span>
+                  {!project.can_edit && (
+                    <span className="owner-badge">
+                      Owner: {project.first_name} {project.last_name}
+                    </span>
+                  )}
+                </div>
               </div>
 
               <p className="project-description">
@@ -170,5 +183,3 @@ const Projects = () => {
 };
 
 export default Projects;
-
-
